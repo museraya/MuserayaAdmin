@@ -1,0 +1,166 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museraya Admin - Manage Items</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #333333;
+        }
+
+        header {
+            background-color: #333333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            border-bottom: 5px solid #B5B8A3;
+        }
+
+        .container {
+            width: 90%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #D9CFC1;
+        }
+
+        table th {
+            background-color: #D16A3B;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #D16A3B;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        button {
+            padding: 8px 16px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #D16A3B;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            background-color: #333333;
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #555555;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            table, th, td {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            header {
+                font-size: 22px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .table-container {
+                position: relative;
+                overflow-x: auto;
+            }
+
+            table th {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: #D16A3B;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Museraya Admin</header>
+
+    <div class="container">
+        <a href="index.html" class="back-button">Back to Home</a>
+        <h2 style="color: #333333;">Edit Items</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Info</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    <!-- Dynamic content will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="items.js"></script>
+</body>
+</html>

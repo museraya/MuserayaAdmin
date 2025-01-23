@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museraya Admin</title>
+    <style>
+        /* General body styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0; /* Light background */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #333333; /* Text color */
+        }
+
+        /* Header styles */
+        header {
+            background-color: #333333; /* Accent color */
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            border-bottom: 5px solid #B5B8A3; /* Subtle border */
+        }
+
+        /* Container for the main content */
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Table container to enable horizontal scrolling */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* Horizontal scrolling for smaller screens */
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #D9CFC1; /* Light border color */
+        }
+
+        table th {
+            background-color: #D16A3B; /* Accent color */
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9; /* Light gray background for even rows */
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1; /* Slightly darker hover effect */
+        }
+
+        /* Button styles */
+        button {
+            padding: 8px 16px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        button.accept {
+            background-color: #D16A3B; /* Accent color */
+            color: white;
+        }
+
+        button.reject {
+            background-color: #B5B8A3; /* Red for reject */
+            color: white;
+        }
+
+        button.delete {
+            background-color: #333333; /* Orange for delete */
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive Design for smaller screens */
+        @media (max-width: 768px) {
+            table, th, td {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            header {
+                font-size: 22px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            /* Ensure the table headers are sticky at the top of the container */
+            .table-container {
+                position: relative;
+                overflow-x: auto;
+            }
+
+            table th {
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                background-color: #D16A3B;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Museraya Admin
+    </header>
+
+    <div class="container">
+        <h2 style="color: #333333;">Booking</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Quantity</th>
+                        <th>Date</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTableBody">
+                    <!-- Dynamic content will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 style="color: #333333;">Edit Items</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Info</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    <!-- Dynamic content will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+        import { Timestamp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";  // Import Timestamp
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
+            authDomain: "museraya-1e747.firebaseapp.com",
+            databaseURL: "https://museraya-1e747-default-rtdb.firebaseio.com",
+            projectId: "museraya-1e747",
+            storageBucket: "museraya-1e747.firebasestorage.app",
+            messagingSenderId: "235868279350",
+            appId: "1:235868279350:web:ad4af197ca0118bbfd3e97",
+            measurementId: "G-VCX0P5SZC8"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to format date in the "dd MMM yyyy, hh:mm a" format (PHT)
+        function formatDate(timestamp) {
+            if (timestamp instanceof Timestamp) {
+                const date = timestamp.toDate();  // Convert Firebase Timestamp to JavaScript Date
+                
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true, // AM/PM format
+                    timeZone: 'Asia/Manila'  // Set timezone to Philippine Time (PHT)
+                };
+
+                // Format the date using toLocaleString and return it
+                return date.toLocaleString('en-US', options);
+            }
+            return '';  // Return empty if not a valid timestamp
+        }
+
+        // Function to fetch and display booking data
+        async function loadBookings() {
+            const bookingCollection = collection(db, "booking");
+            const bookingsSnapshot = await getDocs(bookingCollection);
+
+            const tableBody = document.getElementById("bookingTableBody");
+            tableBody.innerHTML = ""; // Clear table before loading new data
+
+            bookingsSnapshot.forEach(docSnapshot => {
+                const booking = docSnapshot.data();
+                const formattedDate = formatDate(booking.date);  // Format the date (timestamp)
+                const formattedDateCreated = formatDate(booking.date_created);  // Format the created date (timestamp)
+                const row = document.createElement("tr");
+
+                // Add table cells with formatted dates
+                row.innerHTML = `
+                    <td>${docSnapshot.id}</td>
+                    <td>${booking.name}</td>
+                    <td>${booking.email}</td>
+                    <td>${booking.quantity}</td>
+                    <td>${formattedDate}</td>
+                    <td>${formattedDateCreated}</td>
+                    <td>${booking.status}</td>
+                    <td>
+                        <button class="accept" onclick="updateStatus('${docSnapshot.id}', 'accepted')">Accept</button>
+                        <button class="reject" onclick="updateStatus('${docSnapshot.id}', 'rejected')">Reject</button>
+                        <button class="delete" onclick="deleteBooking('${docSnapshot.id}')">Delete</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to fetch and display items data
+        async function loadItems() {
+            const itemsCollection = collection(db, "items");
+            const itemsSnapshot = await getDocs(itemsCollection);
+
+            const tableBody = document.getElementById("itemsTableBody");
+            tableBody.innerHTML = ""; // Clear table before loading new data
+
+            itemsSnapshot.forEach(docSnapshot => {
+                const item = docSnapshot.data();
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${docSnapshot.id}</td>
+                    <td><input type="text" value="${item.name}" id="name-${docSnapshot.id}"></td>
+                    <td><input type="text" value="${item.info}" id="info-${docSnapshot.id}"></td>
+                    <td>
+                        <button class="accept" onclick="updateItem('${docSnapshot.id}')">Save</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to update item details
+        async function updateItem(docId) {
+            const nameField = document.getElementById(`name-${docId}`).value;
+            const infoField = document.getElementById(`info-${docId}`).value;
+
+            try {
+                const docRef = doc(db, "items", docId);
+                await updateDoc(docRef, { name: nameField, info: infoField });
+                alert(`Item ${docId} has been updated`);
+                loadItems(); // Reload items
+            } catch (error) {
+                console.error("Error updating item:", error);
+            }
+        }
+
+        // Function to update the status
+        async function updateStatus(docId, status) {
+            try {
+                const docRef = doc(db, "booking", docId);
+                await updateDoc(docRef, { status });
+                alert(`Booking ${docId} has been ${status}`);
+                loadBookings(); // Reload bookings
+            } catch (error) {
+                console.error("Error updating status:", error);
+            }
+        }
+
+        // Function to delete a booking
+        async function deleteBooking(docId) {
+            try {
+                const docRef = doc(db, "booking", docId);
+                await deleteDoc(docRef);
+                alert(`Booking ${docId} has been deleted`);
+                loadBookings(); // Reload bookings
+            } catch (error) {
+                console.error("Error deleting booking:", error);
+            }
+        }
+
+        // Attach functions to the global window object
+        window.updateStatus = updateStatus;
+        window.deleteBooking = deleteBooking;
+        window.updateItem = updateItem;
+
+        // Load data on page load
+        window.onload = () => {
+            loadBookings();
+            loadItems();
+        };
+    </script>
+
+</body>
+</html>
