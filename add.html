@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museraya Admin - Add Item</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #333333;
+        }
+
+        header {
+            background-color: #333333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            border-bottom: 5px solid #B5B8A3;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-container textarea {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            resize: none;
+        }
+
+        /* Smaller text areas for ID and Name */
+        #id, #name {
+            height: 50px; /* Smaller height */
+        }
+
+        /* Larger text area for Info */
+        #info {
+            height: 100px; /* Larger height for Info */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #D16A3B;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #B55F2B;
+        }
+
+        .back-button {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            background-color: #333333;
+            color: white;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #555555;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                font-size: 24px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .back-button {
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>Museraya Admin</header>
+
+    <div class="container">
+        <a href="index.html" class="back-button">Back to Home</a>
+        <h2 style="color: #333333;">Add New Item</h2>
+
+        <div class="form-container">
+            <label for="id">ID:</label>
+            <textarea id="id" placeholder="Enter ID"></textarea>
+
+            <label for="name">Name:</label>
+            <textarea id="name" placeholder="Enter Name"></textarea>
+
+            <label for="info">Info:</label>
+            <textarea id="info" placeholder="Enter Info"></textarea>
+
+            <button id="addButton">Add Item</button>
+        </div>
+    </div>
+
+    <script type="module" src="add.js"></script>
+</body>
+</html>
