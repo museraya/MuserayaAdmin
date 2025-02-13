@@ -4,55 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Museraya Admin</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            color: #333333;
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 
-        header {
-            background-color: #333333;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            border-bottom: 5px solid #B5B8A3;
-        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
+            authDomain: "museraya-1e747.firebaseapp.com",
+            projectId: "museraya-1e747",
+            storageBucket: "museraya-1e747.appspot.com",
+            messagingSenderId: "235868279350",
+            appId: "1:235868279350:web:ad4af197ca0118bbfd3e97"
+        };
 
-        .container {
-            text-align: center;
-            margin: 50px auto;
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-        .container button {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin: 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #D16A3B;
-            color: white;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
+        window.validateLogin = function() {
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var errorText = document.getElementById('error');
 
-        .container button:hover {
-            opacity: 0.8;
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    if (email.endsWith('@admin.com')) {
+                        window.location.href = 'home.html';
+                    } else {
+                        errorText.style.display = 'block';
+                        clearFields();
+                    }
+                })
+                .catch((error) => {
+                    errorText.style.display = 'block';
+                    clearFields();
+                });
+        };
+
+        function clearFields() {
+            document.getElementById('email').value = "";
+            document.getElementById('password').value = "";
         }
-    </style>
+    </script>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: #333333;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .login-container {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box; /* Ensures padding doesn't affect width */
+        text-align: center;
+    }
+
+    button {
+        width: 100%;
+        background-color: #D16A3B;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        margin-top: 15px;
+    }
+
+    button:hover {
+        background-color: #bb5733;
+    }
+
+    #error {
+        color: red;
+        font-weight: bold;
+        display: none;
+        margin-top: 10px;
+    }
+</style>
+
 </head>
 <body>
     <header>Museraya Admin</header>
-    <div class="container">
-        <button onclick="location.href='booking.html'">Manage Appointments</button>
-        <button onclick="location.href='items.html'">Manage Items</button>
-        <button onclick="location.href='add.html'">Add Items</button>
+    <div class="login-container" id="login-form">
+        <h2>Admin Login</h2>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button onclick="validateLogin()">Login</button>
+        <p id="error">Invalid email or password. Please try again.</p>
     </div>
 </body>
 </html>
