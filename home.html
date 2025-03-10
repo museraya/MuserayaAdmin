@@ -5,85 +5,272 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
             box-sizing: border-box;
-            color: #333333;
+            font-family: 'Arial', sans-serif;
         }
 
-        header {
-            background-color: #333333;
-            color: white;
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            border-bottom: 5px solid #B5B8A3;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 80px; /* Ensure fixed height */
+        body {
             display: flex;
+            height: 100vh;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center; /* Perfect centering */
+            position: fixed;
+            height: 100%;
         }
 
-        .admin-panel {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #B5B8A3;
+            padding-bottom: 10px;
+            width: 80%;
             text-align: center;
-            width: 350px;
-            margin-top: 100px; /* Adjusted for header height */
         }
 
-        .admin-buttons button, .logout-button {
-            width: 100%;
-            margin-top: 10px;
+        .sidebar button {
+            width: 80%;
             background-color: #D16A3B;
             color: white;
             padding: 14px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
+            margin: 10px 0;
             transition: background-color 0.3s ease;
         }
 
-        .admin-buttons button:hover, .logout-button:hover {
+        .sidebar button:hover {
             background-color: #bb5733;
         }
 
         .logout-button {
-            margin-top: 20px;
             background-color: #c0392b;
         }
 
         .logout-button:hover {
             background-color: #a93226;
         }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .content-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            margin: auto;
+        }
+
+        /* Table styles */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #D9CFC1;
+        }
+
+        table th {
+            background-color: #D16A3B;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button.accept {
+            background-color: #D16A3B; 
+            color: white;
+        }
+        button.reject {
+            background-color: #B5B8A3;
+            color: white;
+        }
+
+        button.delete {
+            background-color: #333333;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* Hide content sections */
+        .section {
+            display: none;
+        }
+
+        /* Show active section */
+        .active {
+            display: block;
+        }
+
+        /* Status styles */
+        .status-accepted {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
-    <header>Museraya Admin</header>
-    <div class="admin-panel">
-        <h2>Admin Panel</h2>
-        <div class="admin-buttons">
-            <button onclick="location.href='booking.html'">Manage Appointments</button>
-            <button onclick="location.href='items.html'">Manage Items</button>
-            <button onclick="location.href='add.html'">Add Items</button>
-        </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Museraya Admin</h2>
+        <button onclick="showSection('appointments')">Manage Appointments</button>
+        <button onclick="location.href='items.html'">Manage Items</button>
+        <button onclick="location.href='add.html'">Add Items</button>
         <button class="logout-button" onclick="location.href='index.html'">Logout</button>
     </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+        <!-- Appointments Section -->
+        <div id="appointments" class="content-box section active">
+            <h2 style="color: #333333;">Manage Appointments</h2>
+            <br>
+
+            <!-- Pending Appointments Table -->
+            <h3>Pending Bookings</h3>
+            <table id="pendingBookingsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Quantity</th>
+                        <th>Appointment Schedule</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingBookingTableBody"></tbody>
+            </table>
+            <br>
+            <br>
+            <!-- Accepted Bookings Table -->
+            <h3>Accepted Bookings</h3>
+            <table id="acceptedBookingsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Quantity</th>
+                        <th>Appointment Schedule</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="acceptedBookingTableBody"></tbody>
+            </table>
+            <br>
+            <br>
+            <!-- Rejected Bookings Table -->
+            <h3>Rejected Bookings</h3>
+            <table id="rejectedBookingsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Quantity</th>
+                        <th>Appointment Schedule</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rejectedBookingTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Manage Items Section -->
+        <div id="items" class="content-box section">
+            <h2>Manage Items</h2>
+            <p>Manage and update the available items here.</p>
+        </div>
+
+        <!-- Add Items Section -->
+        <div id="add" class="content-box section">
+            <h2>Add Items</h2>
+            <p>Add new items to the system.</p>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+    </script>
+
+    <script type="module" src="booking.js"></script>
+
 </body>
 </html>
+

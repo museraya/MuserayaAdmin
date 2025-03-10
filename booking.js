@@ -28,28 +28,73 @@ function formatDate(timestamp) {
 async function loadBookings() {
     const bookingCollection = collection(db, "booking");
     const bookingsSnapshot = await getDocs(bookingCollection);
-    const tableBody = document.getElementById("bookingTableBody");
-    tableBody.innerHTML = "";
+
+    // Clear previous data
+    const pendingTableBody = document.getElementById("pendingBookingTableBody");
+    const acceptedTableBody = document.getElementById("acceptedBookingTableBody");
+    const rejectedTableBody = document.getElementById("rejectedBookingTableBody");
+    pendingTableBody.innerHTML = "";
+    acceptedTableBody.innerHTML = "";
+    rejectedTableBody.innerHTML = "";
+
+    const bookings = [];
+
     bookingsSnapshot.forEach(docSnapshot => {
         const booking = docSnapshot.data();
+        booking.id = docSnapshot.id; // Add the document ID
+        bookings.push(booking);
+    });
+
+    // Sort bookings by date (closest to farthest)
+    bookings.sort((a, b) => {
+        const dateA = a.date instanceof Timestamp ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date instanceof Timestamp ? b.date.toDate() : new Date(b.date);
+        return dateA - dateB; // Ascending order: closest date first
+    });
+
+    // Loop through bookings and categorize them based on status
+    bookings.forEach(booking => {
         const formattedDate = formatDate(booking.date);
         const formattedDateCreated = formatDate(booking.date_created);
         const row = document.createElement("tr");
+        const statusClass = booking.status === "accepted" ? "status-accepted" : booking.status === "rejected" ? "status-rejected" : "";
+
         row.innerHTML = `
-            <td>${docSnapshot.id}</td>
             <td>${booking.name}</td>
             <td>${booking.email}</td>
             <td>${booking.quantity}</td>
             <td>${formattedDate}</td>
             <td>${formattedDateCreated}</td>
-            <td>${booking.status}</td>
-            <td>
-                <button class="accept" onclick="updateStatus('${docSnapshot.id}', 'accepted')">Accept</button>
-                <button class="reject" onclick="updateStatus('${docSnapshot.id}', 'rejected')">Reject</button>
-                <button class="delete" onclick="deleteBooking('${docSnapshot.id}')">Delete</button>
-            </td>
+            <td><span class="${statusClass}">${booking.status}</span></td>
         `;
-        tableBody.appendChild(row);
+
+        // Add action buttons
+        if (booking.status === "pending") {
+            row.innerHTML += `
+                <td>
+                    <button class="accept" onclick="updateStatus('${booking.id}', 'accepted')">Accept</button>
+                    <button class="reject" onclick="updateStatus('${booking.id}', 'rejected')">Reject</button>
+                    <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
+                </td>
+            `;
+            pendingTableBody.appendChild(row);
+        } else if (booking.status === "accepted") {
+            row.innerHTML += `
+                <td>
+                    <button class="reject" onclick="updateStatus('${booking.id}', 'rejected')">Reject</button>
+                    <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
+                </td>
+            `;
+            acceptedTableBody.appendChild(row);
+        } else if (booking.status === "rejected") {
+            row.innerHTML += `
+                <td>
+                    <button class="accept" onclick="updateStatus('${booking.id}', 'accepted')">Accept</button>
+                    <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
+                </td>
+            `;
+            rejectedTableBody.appendChild(row);
+        }
     });
 }
 
