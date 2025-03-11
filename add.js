@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
@@ -12,28 +12,22 @@ const firebaseConfig = {
     measurementId: "G-VCX0P5SZC8"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Add item to Firestore
 document.getElementById("addButton").addEventListener("click", async () => {
-    const id = document.getElementById("id").value.trim();
+    const category = document.getElementById("category").value;
     const name = document.getElementById("name").value.trim();
     const info = document.getElementById("info").value.trim();
 
-    if (id && name && info) {
+    if (category && name && info) {
         try {
-            // Add a document with the 'id' as the document name
-            const docRef = doc(db, "items", id);
-            await setDoc(docRef, {
+            const docRef = await addDoc(collection(db, category), {
                 name: name,
                 info: info
             });
-            alert("Item added successfully!");
-            
-            // Clear the input fields
-            document.getElementById("id").value = '';
+            alert("Item added successfully! ID: " + docRef.id);
+
             document.getElementById("name").value = '';
             document.getElementById("info").value = '';
         } catch (e) {

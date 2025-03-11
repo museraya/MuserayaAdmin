@@ -81,6 +81,7 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
             width: 90%;
             margin: auto;
+            margin-bottom: 20px;
         }
 
         /* Table styles */
@@ -92,7 +93,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         table th, table td {
@@ -129,6 +130,7 @@
             background-color: #333;
             color: white;
         }
+
         button.delete {
             background-color: #c0392b;
             color: white;
@@ -152,20 +154,65 @@
     <!-- Main content -->
     <div class="main-content">
         <div class="content-box">
-            <h2 style="color: #333;">Manage Items</h2>
+            <h2 style="color: #333;">Audio Collection</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Info</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="itemsTableBody">
-                        <!-- Dynamic content will be loaded here -->
-                    </tbody>
+                    <tbody id="audioTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="content-box">
+            <h2 style="color: #333;">Film Collection</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Info</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filmTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="content-box">
+            <h2 style="color: #333;">Music Collection</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Info</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="musicTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="content-box">
+            <h2 style="color: #333;">Art Collection</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Info</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artTableBody"></tbody>
                 </table>
             </div>
         </div>
