@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
@@ -32,6 +32,7 @@ async function loadItems() {
                     <td>
                         <button class="edit" onclick="editItem('${category}', '${docSnapshot.id}')">Edit</button>
                         <button class="save" onclick="updateItem('${category}', '${docSnapshot.id}')">Save</button>
+                        <button class="delete" onclick="deleteItem('${category}', '${docSnapshot.id}')">Delete</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -53,7 +54,7 @@ function editItem(category, docId) {
 async function updateItem(category, docId) {
     const nameValue = document.getElementById(`edit-name-${category}-${docId}`).value;
     const infoValue = document.getElementById(`edit-info-${category}-${docId}`).value;
-    
+
     try {
         const docRef = doc(db, category, docId);
         await updateDoc(docRef, { name: nameValue, info: infoValue });
@@ -64,6 +65,18 @@ async function updateItem(category, docId) {
     }
 }
 
+async function deleteItem(category, docId) {
+    try {
+        const docRef = doc(db, category, docId);
+        await deleteDoc(docRef);
+        alert(`Item deleted from ${category}`);
+        loadItems(); // Refresh table
+    } catch (error) {
+        console.error("Error deleting item:", error);
+    }
+}
+
 window.editItem = editItem;
 window.updateItem = updateItem;
+window.deleteItem = deleteItem;
 window.onload = loadItems;

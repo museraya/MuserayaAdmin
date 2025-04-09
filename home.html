@@ -1,276 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
 
-        body {
-            display: flex;
-            height: 100vh;
-            background-color: #f0f0f0;
-            color: #333;
-        }
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css" rel="stylesheet"/>
 
-        /* Sidebar styles */
-        .sidebar {
-            width: 250px;
-            background-color: #333;
-            color: white;
-            padding-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: fixed;
-            height: 100%;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
 
-        .sidebar h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #B5B8A3;
-            padding-bottom: 10px;
-            width: 80%;
-            text-align: center;
-        }
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #f0f0f0;
+      color: #333;
+    }
 
-        .sidebar button {
-            width: 80%;
-            background-color: #D16A3B;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 10px 0;
-            transition: background-color 0.3s ease;
-        }
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      height: 100%;
+    }
 
-        .sidebar button:hover {
-            background-color: #bb5733;
-        }
+    .sidebar h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #B5B8A3;
+      padding-bottom: 10px;
+      width: 80%;
+      text-align: center;
+    }
 
-        .logout-button {
-            background-color: #c0392b;
-        }
+    .sidebar button {
+      width: 80%;
+      background-color: #D16A3B;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 0;
+      transition: background-color 0.3s ease;
+    }
 
-        .logout-button:hover {
-            background-color: #a93226;
-        }
+    .sidebar button:hover {
+      background-color: #bb5733;
+    }
 
-        /* Main content area */
-        .main-content {
-            margin-left: 250px;
-            flex: 1;
-            padding: 20px;
-        }
+    .logout-button {
+      background-color: #c0392b;
+    }
 
-        .content-box {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            margin: auto;
-        }
+    .logout-button:hover {
+      background-color: #a93226;
+    }
 
-        /* Table styles */
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-        }
+    .main-content {
+      margin-left: 250px;
+      flex: 1;
+      padding: 20px;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    .content-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      margin: auto;
+    }
 
-        table th, table td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #D9CFC1;
-        }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
 
-        table th {
-            background-color: #D16A3B;
-            color: white;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
 
-        table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    table th, table td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #D9CFC1;
+    }
 
-        table tr:hover {
-            background-color: #f1f1f1;
-        }
+    table th {
+      background-color: #D16A3B;
+      color: white;
+    }
 
-        button {
-            padding: 8px 16px;
-            margin-right: 5px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
+    table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
 
-        button.accept {
-            background-color: #D16A3B; 
-            color: white;
-        }
-        button.reject {
-            background-color: #B5B8A3;
-            color: white;
-        }
+    table tr:hover {
+      background-color: #f1f1f1;
+    }
 
-        button.delete {
-            background-color: #333333;
-            color: white;
-        }
+    button {
+      padding: 8px 16px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
 
-        button:hover {
-            opacity: 0.8;
-        }
+    button.accept {
+      background-color: #D16A3B;
+      color: white;
+    }
 
-        /* Hide content sections */
-        .section {
-            display: none;
-        }
+    button.reject {
+      background-color: #B5B8A3;
+      color: white;
+    }
 
-        /* Show active section */
-        .active {
-            display: block;
-        }
+    button.delete {
+      background-color: #333333;
+      color: white;
+    }
 
-        /* Status styles */
-        .status-accepted {
-            background-color: green;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
+    button:hover {
+      opacity: 0.8;
+    }
 
-        .status-rejected {
-            background-color: red;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
+    .section {
+      display: none;
+    }
 
-    </style>
+    .active {
+      display: block;
+    }
+
+    .status-accepted {
+      background-color: green;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .status-rejected {
+      background-color: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    #calendar {
+      margin-top: 40px;
+    }
+
+  </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Museraya Admin</h2>
-        <button onclick="showSection('appointments')">Manage Appointments</button>
-        <button onclick="location.href='items.html'">Manage Items</button>
-        <button onclick="location.href='add.html'">Add Items</button>
-        <button class="logout-button" onclick="location.href='index.html'">Logout</button>
-    </div>
+<div class="sidebar">
+  <h2>Museraya Admin</h2>
+  <button onclick="showSection('appointments')">Manage Appointments</button>
+  <button onclick="location.href='items.html'">Manage Items</button>
+  <button onclick="location.href='add.html'">Add Items</button>
+  <button class="logout-button" onclick="location.href='index.html'">Logout</button>
+</div>
 
-    <!-- Main content area -->
-    <div class="main-content">
-        <!-- Appointments Section -->
-        <div id="appointments" class="content-box section active">
-            <h2 style="color: #333333;">Manage Appointments</h2>
-            <br>
+<div class="main-content">
+  <!-- Appointments Section -->
+  <div id="appointments" class="content-box section active">
+    <h2 style="color: #333333;">Manage Appointments</h2>
+    <br>
 
-            <!-- Pending Appointments Table -->
-            <h3>Pending Bookings</h3>
-            <table id="pendingBookingsTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Quantity</th>
-                        <th>Appointment Schedule</th>
-                        <th>Date Created</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="pendingBookingTableBody"></tbody>
-            </table>
-            <br>
-            <br>
-            <!-- Accepted Bookings Table -->
-            <h3>Accepted Bookings</h3>
-            <table id="acceptedBookingsTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Quantity</th>
-                        <th>Appointment Schedule</th>
-                        <th>Date Created</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="acceptedBookingTableBody"></tbody>
-            </table>
-            <br>
-            <br>
-            <!-- Rejected Bookings Table -->
-            <h3>Rejected Bookings</h3>
-            <table id="rejectedBookingsTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Quantity</th>
-                        <th>Appointment Schedule</th>
-                        <th>Date Created</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="rejectedBookingTableBody"></tbody>
-            </table>
-        </div>
+    <h3>Pending Bookings</h3>
+    <table id="pendingBookingsTable">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Quantity</th>
+        <th>Appointment Schedule</th>
+        <th>Date Created</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="pendingBookingTableBody"></tbody>
+    </table>
 
-        <!-- Manage Items Section -->
-        <div id="items" class="content-box section">
-            <h2>Manage Items</h2>
-            <p>Manage and update the available items here.</p>
-        </div>
+    <br><br>
 
-        <!-- Add Items Section -->
-        <div id="add" class="content-box section">
-            <h2>Add Items</h2>
-            <p>Add new items to the system.</p>
-        </div>
-    </div>
+    <h3>Accepted Bookings</h3>
+    <table id="acceptedBookingsTable">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Quantity</th>
+        <th>Appointment Schedule</th>
+        <th>Date Created</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="acceptedBookingTableBody"></tbody>
+    </table>
 
-    <script>
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
+    <br><br>
 
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-        }
-    </script>
+    <h3>Rejected Bookings</h3>
+    <table id="rejectedBookingsTable">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Quantity</th>
+        <th>Appointment Schedule</th>
+        <th>Date Created</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="rejectedBookingTableBody"></tbody>
+    </table>
 
-    <script type="module" src="booking.js"></script>
+    <!-- Calendar -->
+    <h3 style="margin-top: 60px;">Appointment Calendar</h3>
+    <div id="calendar"></div>
+  </div>
+</div>
+
+<script>
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+      section.classList.remove('active');
+    });
+    document.getElementById(sectionId).classList.add('active');
+  }
+</script>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+
+<!-- Firebase & Booking Script -->
+<script type="module" src="booking.js"></script>
 
 </body>
 </html>
-
