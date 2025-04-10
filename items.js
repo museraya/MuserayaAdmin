@@ -1,3 +1,5 @@
+// items.js
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
@@ -26,9 +28,15 @@ async function loadItems() {
             itemsSnapshot.forEach(docSnapshot => {
                 const item = docSnapshot.data();
                 const row = document.createElement("tr");
+                
+                // Debugging: Log the image URL to the console
+                console.log("Image URL:", item.url); 
+
                 row.innerHTML = `
                     <td><span id="name-${category}-${docSnapshot.id}">${item.name}</span></td>
                     <td><span id="info-${category}-${docSnapshot.id}">${item.info}</span></td>
+                    <td><span id="url-${category}-${docSnapshot.id}">${item.url}</span></td>
+                    <td class="image-column"><img src="${item.url}" alt="${item.name}" style="max-width: 100px; max-height: 100px;"></td>
                     <td>
                         <button class="edit" onclick="editItem('${category}', '${docSnapshot.id}')">Edit</button>
                         <button class="save" onclick="updateItem('${category}', '${docSnapshot.id}')">Save</button>
@@ -46,18 +54,21 @@ async function loadItems() {
 function editItem(category, docId) {
     const nameField = document.getElementById(`name-${category}-${docId}`);
     const infoField = document.getElementById(`info-${category}-${docId}`);
+    const urlField = document.getElementById(`url-${category}-${docId}`);
 
     nameField.innerHTML = `<input type="text" value="${nameField.innerText}" id="edit-name-${category}-${docId}" style="width: 500; height: 40px; font-size: 16px;">`;
     infoField.innerHTML = `<textarea id="edit-info-${category}-${docId}" style="width: 1000px; height: 100px; font-size: 16px;">${infoField.innerText}</textarea>`;
+    urlField.innerHTML = `<input type="text" value="${urlField.innerText}" id="edit-url-${category}-${docId}" style="width: 1000px; height: 40px; font-size: 16px;">`;
 }
 
 async function updateItem(category, docId) {
     const nameValue = document.getElementById(`edit-name-${category}-${docId}`).value;
     const infoValue = document.getElementById(`edit-info-${category}-${docId}`).value;
+    const urlValue = document.getElementById(`edit-url-${category}-${docId}`).value;
 
     try {
         const docRef = doc(db, category, docId);
-        await updateDoc(docRef, { name: nameValue, info: infoValue });
+        await updateDoc(docRef, { name: nameValue, info: infoValue, url: urlValue });
         alert(`Item updated in ${category}`);
         loadItems(); // Refresh table
     } catch (error) {
@@ -66,6 +77,9 @@ async function updateItem(category, docId) {
 }
 
 async function deleteItem(category, docId) {
+    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmDelete) return;
+
     try {
         const docRef = doc(db, category, docId);
         await deleteDoc(docRef);
