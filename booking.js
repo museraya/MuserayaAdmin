@@ -103,6 +103,15 @@ async function loadBookings() {
         </td>
       `;
       declinedTableBody.appendChild(row);
+      if (booking.reason) {
+        const reasonRow = document.createElement("tr");
+        reasonRow.innerHTML = `
+          <td colspan="7" style="color: #b00020; font-style: italic;">
+            Reason: ${booking.reason}
+          </td>
+        `;
+        declinedTableBody.appendChild(reasonRow);
+      }
     }
   });
 
@@ -112,13 +121,26 @@ async function loadBookings() {
 async function updateStatus(docId, status) {
   try {
     const docRef = doc(db, "booking", docId);
-    await updateDoc(docRef, { status });
+    let updateData = { status };
+
+    // If declining, prompt for reason
+    if (status === "declined") {
+      const reason = prompt("Please enter the reason for declining this appointment:");
+      if (reason === null || reason.trim() === "") {
+        alert("Decline cancelled. Reason is required.");
+        return;
+      }
+      updateData.reason = reason.trim();
+    }
+
+    await updateDoc(docRef, updateData);
     alert(`Booking ${docId} has been ${status}`);
     loadBookings();
   } catch (error) {
     console.error("Error updating status:", error);
   }
 }
+
 
 async function deleteBooking(docId) {
   try {
