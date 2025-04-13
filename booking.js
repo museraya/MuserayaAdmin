@@ -34,10 +34,10 @@ async function loadBookings() {
 
   const pendingTableBody = document.getElementById("pendingBookingTableBody");
   const acceptedTableBody = document.getElementById("acceptedBookingTableBody");
-  const rejectedTableBody = document.getElementById("rejectedBookingTableBody");
+  const declinedTableBody = document.getElementById("declinedBookingTableBody");
   pendingTableBody.innerHTML = "";
   acceptedTableBody.innerHTML = "";
-  rejectedTableBody.innerHTML = "";
+  declinedTableBody.innerHTML = "";
 
   const calendarEvents = [];
 
@@ -59,7 +59,7 @@ async function loadBookings() {
     const formattedDateCreated = formatDate(booking.date_created);
     const row = document.createElement("tr");
     const statusClass = booking.status === "accepted" ? "status-accepted" :
-                        booking.status === "rejected" ? "status-rejected" : "";
+                        booking.status === "declined" ? "status-declined" : "";
 
     row.innerHTML = `
       <td>${booking.name}</td>
@@ -75,14 +75,14 @@ async function loadBookings() {
     calendarEvents.push({
       title: booking.name,
       start: timestampDate.toISOString(),
-      color: booking.status === "accepted" ? "green" : booking.status === "rejected" ? "red" : "orange"
+      color: booking.status === "accepted" ? "green" : booking.status === "declined" ? "red" : "orange"
     });
 
     if (booking.status === "pending") {
       row.innerHTML += `
         <td>
           <button class="accept" onclick="updateStatus('${booking.id}', 'accepted')">Accept</button>
-          <button class="reject" onclick="updateStatus('${booking.id}', 'rejected')">Reject</button>
+          <button class="decline" onclick="updateStatus('${booking.id}', 'declined')">Decline</button>
           <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
         </td>
       `;
@@ -90,19 +90,19 @@ async function loadBookings() {
     } else if (booking.status === "accepted") {
       row.innerHTML += `
         <td>
-          <button class="reject" onclick="updateStatus('${booking.id}', 'rejected')">Reject</button>
+          <button class="decline" onclick="updateStatus('${booking.id}', 'declined')">Decline</button>
           <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
         </td>
       `;
       acceptedTableBody.appendChild(row);
-    } else if (booking.status === "rejected") {
+    } else if (booking.status === "declined") {
       row.innerHTML += `
         <td>
           <button class="accept" onclick="updateStatus('${booking.id}', 'accepted')">Accept</button>
           <button class="delete" onclick="deleteBooking('${booking.id}')">Delete</button>
         </td>
       `;
-      rejectedTableBody.appendChild(row);
+      declinedTableBody.appendChild(row);
     }
   });
 
