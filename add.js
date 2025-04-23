@@ -19,25 +19,23 @@ document.getElementById("addButton").addEventListener("click", async () => {
     const category = document.getElementById("category").value;
     const name = document.getElementById("name").value.trim();
     const info = document.getElementById("info").value.trim();
-    const imageFile = document.getElementById("image").files[0]; // Get the image file
+    const imageFile = document.getElementById("image").files[0];
 
     if (category && name && info && imageFile) {
         try {
-            // Step 1: Upload the image to Imgur
             const imageUrl = await uploadImageToImgur(imageFile);
 
-            // Step 2: Add the item to Firestore with the image URL
             const docRef = await addDoc(collection(db, category), {
                 name: name,
                 info: info,
-                url: imageUrl // Store the image URL in the Firestore document
+                url: imageUrl
             });
 
             alert("Item added successfully! ID: " + docRef.id);
 
             document.getElementById("name").value = '';
             document.getElementById("info").value = '';
-            document.getElementById("image").value = ''; // Clear the file input
+            document.getElementById("image").value = '';
 
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -48,9 +46,8 @@ document.getElementById("addButton").addEventListener("click", async () => {
     }
 });
 
-// Function to upload an image to Imgur and return the URL
 async function uploadImageToImgur(imageFile) {
-    const clientId = "b21c768afa164c8"; // Get this from Imgur's API documentation
+    const clientId = "b21c768afa164c8";
 
     const formData = new FormData();
     formData.append("image", imageFile);
@@ -66,7 +63,7 @@ async function uploadImageToImgur(imageFile) {
     const data = await response.json();
 
     if (data.success) {
-        return data.data.link; // This is the URL of the uploaded image
+        return data.data.link;
     } else {
         throw new Error("Failed to upload image to Imgur");
     }
