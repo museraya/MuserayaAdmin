@@ -20,15 +20,18 @@ document.getElementById("addButton").addEventListener("click", async () => {
     const name = document.getElementById("name").value.trim();
     const info = document.getElementById("info").value.trim();
     const imageFile = document.getElementById("image").files[0];
+    const coverFile = document.getElementById("cover").files[0]; // New cover image
 
-    if (category && name && info && imageFile) {
+    if (category && name && info && imageFile && coverFile) {
         try {
             const imageUrl = await uploadImageToImgur(imageFile);
+            const coverUrl = await uploadImageToImgur(coverFile);
 
             const docRef = await addDoc(collection(db, category), {
                 name: name,
                 info: info,
-                url: imageUrl
+                url: imageUrl,
+                cover: coverUrl // New cover field
             });
 
             alert("Item added successfully! ID: " + docRef.id);
@@ -36,13 +39,14 @@ document.getElementById("addButton").addEventListener("click", async () => {
             document.getElementById("name").value = '';
             document.getElementById("info").value = '';
             document.getElementById("image").value = '';
+            document.getElementById("cover").value = ''; // Clear cover input
 
         } catch (e) {
             console.error("Error adding document: ", e);
             alert("Error adding item.");
         }
     } else {
-        alert("Please fill all fields and upload an image.");
+        alert("Please fill all fields and upload both images.");
     }
 });
 
