@@ -20,7 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const categories = ["audio", "film", "music", "art"];
+const categories = ["audio", "film", "music", "art", "misc"];
 
 async function loadItems() {
     try {
