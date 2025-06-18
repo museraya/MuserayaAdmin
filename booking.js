@@ -64,6 +64,7 @@ async function loadBookings() {
     row.innerHTML = `
       <td>${booking.name}</td>
       <td>${booking.email}</td>
+      <td>${booking.contact || 'N/A'}</td>
       <td>${booking.quantity}</td>
       <td>${formattedDate}</td>
       <td>${formattedDateCreated}</td>
@@ -106,7 +107,7 @@ async function loadBookings() {
       if (booking.reason) {
         const reasonRow = document.createElement("tr");
         reasonRow.innerHTML = `
-          <td colspan="7" style="color: #b00020; font-style: italic;">
+          <td colspan="8" style="color: #b00020; font-style: italic;">
             Reason: ${booking.reason}
           </td>
         `;
@@ -123,7 +124,6 @@ async function updateStatus(docId, status) {
     const docRef = doc(db, "booking", docId);
     let updateData = { status };
 
-    // If declining, prompt for reason
     if (status === "declined") {
       const reason = prompt("Please enter the reason for declining this appointment:");
       if (reason === null || reason.trim() === "") {
@@ -141,7 +141,6 @@ async function updateStatus(docId, status) {
   }
 }
 
-
 async function deleteBooking(docId) {
   try {
     const docRef = doc(db, "booking", docId);
@@ -155,7 +154,7 @@ async function deleteBooking(docId) {
 
 function renderCalendar(events) {
   const calendarEl = document.getElementById('calendar');
-  calendarEl.innerHTML = ""; // Clear previous
+  calendarEl.innerHTML = "";
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
