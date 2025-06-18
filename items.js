@@ -66,13 +66,65 @@ async function loadItems() {
 function editItem(category, docId) {
     const nameField = document.getElementById(`name-${category}-${docId}`);
     const infoField = document.getElementById(`info-${category}-${docId}`);
-    const urlField = document.getElementById(`url-${category}-${docId}`);
-    const coverField = document.getElementById(`cover-${category}-${docId}`);
+    const urlImg = document.getElementById(`url-${category}-${docId}`);
+    const coverImg = document.getElementById(`cover-${category}-${docId}`);
 
+    // Replace text fields with inputs
     nameField.innerHTML = `<input type="text" value="${nameField.innerText}" id="edit-name-${category}-${docId}" class="edit-input">`;
     infoField.innerHTML = `<textarea id="edit-info-${category}-${docId}" class="edit-textarea">${infoField.innerText}</textarea>`;
-    urlField.outerHTML = `<input type="text" value="${urlField.src}" id="edit-url-${category}-${docId}" class="edit-input">`;
-    coverField.outerHTML = `<input type="text" value="${coverField.src}" id="edit-cover-${category}-${docId}" class="edit-input">`;
+
+    // Replace images with:
+    // 1) text input for URL (hidden link that will be updated on file upload)
+    // 2) file input to select new image and upload to Imgur
+    urlImg.outerHTML = `
+        <div>
+            <input type="text" id="edit-url-${category}-${docId}" value="${urlImg.src}" class="edit-input" readonly style="width: 90%;">
+            <input type="file" id="edit-url-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
+        </div>
+    `;
+
+    coverImg.outerHTML = `
+        <div>
+            <input type="text" id="edit-cover-${category}-${docId}" value="${coverImg.src}" class="edit-input" readonly style="width: 90%;">
+            <input type="file" id="edit-cover-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
+        </div>
+    `;
+
+    // Add event listeners for the file inputs to upload immediately on file selection
+    setTimeout(() => {
+        const urlFileInput = document.getElementById(`edit-url-file-${category}-${docId}`);
+        const coverFileInput = document.getElementById(`edit-cover-file-${category}-${docId}`);
+
+        if (urlFileInput) {
+            urlFileInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    const link = await uploadImageToImgur(file);
+                    document.getElementById(`edit-url-${category}-${docId}`).value = link;
+                    console.log("URL image uploaded, link updated.");
+                } catch (error) {
+                    alert("Failed to upload URL image to Imgur.");
+                    console.error(error);
+                }
+            });
+        }
+
+        if (coverFileInput) {
+            coverFileInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    const link = await uploadImageToImgur(file);
+                    document.getElementById(`edit-cover-${category}-${docId}`).value = link;
+                    console.log("Cover image uploaded, link updated.");
+                } catch (error) {
+                    alert("Failed to upload Cover image to Imgur.");
+                    console.error(error);
+                }
+            });
+        }
+    }, 100); // small delay to ensure inputs are in DOM
 }
 
 async function updateItem(category, docId) {
@@ -107,6 +159,30 @@ async function deleteItem(category, docId) {
         loadItems();
     } catch (error) {
         console.error("Error deleting item:", error);
+    }
+}
+
+// Imgur upload function (same as your provided one)
+async function uploadImageToImgur(imageFile) {
+    const clientId = "b21c768afa164c8";
+
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    const response = await fetch("https://api.imgur.com/3/image", {
+        method: "POST",
+        headers: {
+            Authorization: `Client-ID ${clientId}`,
+        },
+        body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        return data.data.link;
+    } else {
+        throw new Error("Failed to upload image to Imgur");
     }
 }
 
