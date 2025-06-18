@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
     authDomain: "museraya-1e747.firebaseapp.com",
@@ -12,44 +13,81 @@ const firebaseConfig = {
     measurementId: "G-VCX0P5SZC8"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Add button click handler
 document.getElementById("addButton").addEventListener("click", async () => {
     const category = document.getElementById("category").value;
     const name = document.getElementById("name").value.trim();
     const info = document.getElementById("info").value.trim();
-    const imageFile = document.getElementById("image").files[0];
-    const coverFile = document.getElementById("cover").files[0]; // New cover image
+    const coverFile = document.getElementById("cover").files[0]; // Required
 
-    if (category && name && info && imageFile && coverFile) {
+    // Get up to 5 optional image files
+    const imageFiles = [
+        document.getElementById("image1").files[0],
+        document.getElementById("image2").files[0],
+        document.getElementById("image3").files[0],
+        document.getElementById("image4").files[0],
+        document.getElementById("image5").files[0]
+    ];
+
+    // Validate required fields
+    if (category && name && info && coverFile) {
         try {
-            const imageUrl = await uploadImageToImgur(imageFile);
+            // Upload the required cover image
             const coverUrl = await uploadImageToImgur(coverFile);
 
-            const docRef = await addDoc(collection(db, category), {
+            // Upload only selected image files
+            const imageUrls = await Promise.all(
+                imageFiles.map(async (file) => {
+                    if (file) {
+                        return await uploadImageToImgur(file);
+                    } else {
+                        return null;
+                    }
+                })
+            );
+
+            // Prepare Firestore document data
+            const data = {
                 name: name,
                 info: info,
-                url: imageUrl,
-                cover: coverUrl // New cover field
+                cover: coverUrl
+            };
+
+            // Add uploaded image URLs as url, url2, ..., url5
+            imageUrls.forEach((url, index) => {
+                if (url) {
+                    const key = index === 0 ? "url" : `url${index + 1}`;
+                    data[key] = url;
+                }
             });
+
+            // Save to Firestore
+            const docRef = await addDoc(collection(db, category), data);
 
             alert("Item added successfully! ID: " + docRef.id);
 
+            // Clear form
             document.getElementById("name").value = '';
             document.getElementById("info").value = '';
-            document.getElementById("image").value = '';
-            document.getElementById("cover").value = ''; // Clear cover input
+            document.getElementById("cover").value = '';
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`image${i}`).value = '';
+            }
 
         } catch (e) {
             console.error("Error adding document: ", e);
             alert("Error adding item.");
         }
     } else {
-        alert("Please fill all fields and upload both images.");
+        alert("Please fill out category, name, info, and upload a cover photo.");
     }
 });
 
+// Upload to Imgur
 async function uploadImageToImgur(imageFile) {
     const clientId = "b21c768afa164c8";
 

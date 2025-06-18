@@ -89,11 +89,30 @@ function editItem(category, docId) {
 
     // Helper function to create image input HTML
     const createImageInputHtml = (idPrefix, currentSrc) => `
-        <div>
-            <input type="text" id="edit-${idPrefix}-${category}-${docId}" value="${currentSrc}" class="edit-input" readonly style="width: 90%;">
-            <input type="file" id="edit-${idPrefix}-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
+        <div style="margin-bottom: 10px;">
+            <input type="text" id="edit-${idPrefix}-${category}-${docId}" value="${currentSrc}" class="edit-input" readonly style="width: 70%;">
+            <input type="file" id="edit-${idPrefix}-file-${category}-${docId}" accept="image/*">
+            <button type="button" class="delete-image-btn" onclick="deleteImageField('${category}', '${docId}', '${idPrefix}')">🗑</button>
         </div>
     `;
+    async function deleteImageField(category, docId, field) {
+        const confirmDelete = confirm(`Are you sure you want to delete the image in ${field}?`);
+        if (!confirmDelete) return;
+
+        try {
+            const docRef = doc(db, category, docId);
+            const updateData = {};
+            updateData[field] = ""; // Clear the image URL field
+            await updateDoc(docRef, updateData);
+
+            alert(`${field} removed successfully.`);
+            loadItems();
+        } catch (error) {
+            console.error(`Error deleting ${field} field:`, error);
+        }
+    }
+
+    window.deleteImageField = deleteImageField;
 
     // Helper function to attach event listener for file uploads
     const attachFileInputListener = (idPrefix) => {
