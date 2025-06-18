@@ -34,21 +34,35 @@ async function loadItems() {
                 const item = docSnapshot.data();
                 const row = document.createElement("tr");
 
+                // Function to generate image HTML or placeholder
+                const getImageHtml = (url, id, altText) => `
+                    <img id="${id}" src="${url || 'https://via.placeholder.com/100?text=No+Image'}" alt="${altText}"
+                         style="max-width: 100px; max-height: 100px; object-fit: cover;"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/100?text=No+Image';">
+                `;
+                // Function to generate cover image HTML or placeholder
+                const getCoverImageHtml = (url, id, altText) => `
+                    <img id="${id}" src="${url || 'https://via.placeholder.com/100?text=No+Cover'}" alt="${altText}"
+                         style="max-width: 100px; max-height: 100px; object-fit: cover;"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null;this.src='https://via.placeholder.com/100?text=No+Cover';">
+                `;
+
+
                 row.innerHTML = `
-                    <td><span id="name-${category}-${docSnapshot.id}">${item.name}</span></td>
-                    <td><span id="info-${category}-${docSnapshot.id}">${item.info}</span></td>
-                    <td>
-                        <img id="url-${category}-${docSnapshot.id}" src="${item.url}" alt="Image"
-                             style="max-width: 100px; max-height: 100px; object-fit: cover;"
-                             referrerpolicy="no-referrer"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/100?text=No+Image';">
-                    </td>
-                    <td>
-                        <img id="cover-${category}-${docSnapshot.id}" src="${item.cover}" alt="Cover"
-                             style="max-width: 100px; max-height: 100px; object-fit: cover;"
-                             referrerpolicy="no-referrer"
-                             onerror="this.onerror=null;this.src='https://via.placeholder.com/100?text=No+Cover';">
-                    </td>
+                    <td><span id="name-${category}-${docSnapshot.id}">${item.name || ''}</span></td>
+                    <td><span id="info-${category}-${docSnapshot.id}">${item.info || ''}</span></td>
+                <td>
+                    <div>${getImageHtml(item.url, `url-${category}-${docSnapshot.id}`, 'Image')}</div>
+                    <div>${getImageHtml(item.url2, `url2-${category}-${docSnapshot.id}`, 'Image 2')}</div>
+                    <div>${getImageHtml(item.url3, `url3-${category}-${docSnapshot.id}`, 'Image 3')}</div>
+                    <div>${getImageHtml(item.url4, `url4-${category}-${docSnapshot.id}`, 'Image 4')}</div>
+                    <div>${getImageHtml(item.url5, `url5-${category}-${docSnapshot.id}`, 'Image 5')}</div>
+                </td>
+                <td>
+                    ${getCoverImageHtml(item.cover, `cover-${category}-${docSnapshot.id}`, 'Cover')}
+                </td>
                     <td>
                         <button class="edit" onclick="editItem('${category}', '${docSnapshot.id}')">Edit</button>
                         <button class="save" onclick="updateItem('${category}', '${docSnapshot.id}')">Save</button>
@@ -67,63 +81,65 @@ function editItem(category, docId) {
     const nameField = document.getElementById(`name-${category}-${docId}`);
     const infoField = document.getElementById(`info-${category}-${docId}`);
     const urlImg = document.getElementById(`url-${category}-${docId}`);
+    const url2Img = document.getElementById(`url2-${category}-${docId}`); // Added
+    const url3Img = document.getElementById(`url3-${category}-${docId}`); // Added
+    const url4Img = document.getElementById(`url4-${category}-${docId}`); // Added
+    const url5Img = document.getElementById(`url5-${category}-${docId}`); // Added
     const coverImg = document.getElementById(`cover-${category}-${docId}`);
+
+    // Helper function to create image input HTML
+    const createImageInputHtml = (idPrefix, currentSrc) => `
+        <div>
+            <input type="text" id="edit-${idPrefix}-${category}-${docId}" value="${currentSrc}" class="edit-input" readonly style="width: 90%;">
+            <input type="file" id="edit-${idPrefix}-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
+        </div>
+    `;
+
+    // Helper function to attach event listener for file uploads
+    const attachFileInputListener = (idPrefix) => {
+        const fileInput = document.getElementById(`edit-${idPrefix}-file-${category}-${docId}`);
+        if (fileInput) {
+            fileInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    const link = await uploadImageToImgur(file);
+                    document.getElementById(`edit-${idPrefix}-${category}-${docId}`).value = link;
+                    console.log(`${idPrefix} image uploaded, link updated.`);
+                } catch (error) {
+                    alert(`Failed to upload ${idPrefix} image to Imgur.`);
+                    console.error(error);
+                }
+            });
+        }
+    };
+
 
     // Replace text fields with inputs
     nameField.innerHTML = `<input type="text" value="${nameField.innerText}" id="edit-name-${category}-${docId}" class="edit-input">`;
     infoField.innerHTML = `<textarea id="edit-info-${category}-${docId}" class="edit-textarea">${infoField.innerText}</textarea>`;
 
-    // Replace images with:
-    // 1) text input for URL (hidden link that will be updated on file upload)
-    // 2) file input to select new image and upload to Imgur
-    urlImg.outerHTML = `
-        <div>
-            <input type="text" id="edit-url-${category}-${docId}" value="${urlImg.src}" class="edit-input" readonly style="width: 90%;">
-            <input type="file" id="edit-url-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
-        </div>
+    // Replace image elements with input fields and file uploaders
+    const imageTd = urlImg.closest('td');
+    imageTd.innerHTML = `
+        ${createImageInputHtml('url', urlImg.src)}
+        ${createImageInputHtml('url2', url2Img?.src || '')}
+        ${createImageInputHtml('url3', url3Img?.src || '')}
+        ${createImageInputHtml('url4', url4Img?.src || '')}
+        ${createImageInputHtml('url5', url5Img?.src || '')}
     `;
 
-    coverImg.outerHTML = `
-        <div>
-            <input type="text" id="edit-cover-${category}-${docId}" value="${coverImg.src}" class="edit-input" readonly style="width: 90%;">
-            <input type="file" id="edit-cover-file-${category}-${docId}" accept="image/*" style="margin-top:5px;">
-        </div>
-    `;
+    const coverTd = coverImg.closest('td');
+    coverTd.innerHTML = createImageInputHtml('cover', coverImg.src);
 
     // Add event listeners for the file inputs to upload immediately on file selection
     setTimeout(() => {
-        const urlFileInput = document.getElementById(`edit-url-file-${category}-${docId}`);
-        const coverFileInput = document.getElementById(`edit-cover-file-${category}-${docId}`);
-
-        if (urlFileInput) {
-            urlFileInput.addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-                try {
-                    const link = await uploadImageToImgur(file);
-                    document.getElementById(`edit-url-${category}-${docId}`).value = link;
-                    console.log("URL image uploaded, link updated.");
-                } catch (error) {
-                    alert("Failed to upload URL image to Imgur.");
-                    console.error(error);
-                }
-            });
-        }
-
-        if (coverFileInput) {
-            coverFileInput.addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-                try {
-                    const link = await uploadImageToImgur(file);
-                    document.getElementById(`edit-cover-${category}-${docId}`).value = link;
-                    console.log("Cover image uploaded, link updated.");
-                } catch (error) {
-                    alert("Failed to upload Cover image to Imgur.");
-                    console.error(error);
-                }
-            });
-        }
+        attachFileInputListener('url');
+        attachFileInputListener('url2'); // Added
+        attachFileInputListener('url3'); // Added
+        attachFileInputListener('url4'); // Added
+        attachFileInputListener('url5'); // Added
+        attachFileInputListener('cover');
     }, 100); // small delay to ensure inputs are in DOM
 }
 
@@ -131,6 +147,10 @@ async function updateItem(category, docId) {
     const nameValue = document.getElementById(`edit-name-${category}-${docId}`).value;
     const infoValue = document.getElementById(`edit-info-${category}-${docId}`).value;
     const urlValue = document.getElementById(`edit-url-${category}-${docId}`).value;
+    const url2Value = document.getElementById(`edit-url2-${category}-${docId}`)?.value || ''; // Added, with fallback
+    const url3Value = document.getElementById(`edit-url3-${category}-${docId}`)?.value || ''; // Added, with fallback
+    const url4Value = document.getElementById(`edit-url4-${category}-${docId}`)?.value || ''; // Added, with fallback
+    const url5Value = document.getElementById(`edit-url5-${category}-${docId}`)?.value || ''; // Added, with fallback
     const coverValue = document.getElementById(`edit-cover-${category}-${docId}`).value;
 
     try {
@@ -139,6 +159,10 @@ async function updateItem(category, docId) {
             name: nameValue,
             info: infoValue,
             url: urlValue,
+            url2: url2Value, // Added
+            url3: url3Value, // Added
+            url4: url4Value, // Added
+            url5: url5Value, // Added
             cover: coverValue
         });
         alert(`Item updated in ${category}`);
