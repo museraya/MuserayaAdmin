@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
-// Firebase config
+// firebase
 const firebaseConfig = {
     apiKey: "AIzaSyAuliUOaOVvAr14JPKemiZBsUISMJy9R6I",
     authDomain: "museraya-1e747.firebaseapp.com",
@@ -19,10 +19,15 @@ const db = getFirestore(app);
 
 // Add button click handler
 document.getElementById("addButton").addEventListener("click", async () => {
+    // variables for button loading
+    const addButton = document.getElementById("addButton");
+    const loadingText = document.getElementById("loadingText");
+
     const category = document.getElementById("category").value;
     const name = document.getElementById("name").value.trim();
     const info = document.getElementById("info").value.trim();
-    const coverFile = document.getElementById("cover").files[0]; // Required
+    const coverFile = document.getElementById("cover").files[0]; 
+    const imageReq = document.getElementById("image1").files[0];
 
     // Get up to 5 optional image files
     const imageFiles = [
@@ -34,8 +39,14 @@ document.getElementById("addButton").addEventListener("click", async () => {
     ];
 
     // Validate required fields
-    if (category && name && info && coverFile) {
+    if (category && name && info && coverFile && imageReq) {
+        // start ng loading using if statement
         try {
+            // Disable button and show loading
+            addButton.disabled = true;
+            addButton.style.backgroundColor = "#aaa";
+            if (loadingText) loadingText.style.display = "block";
+
             // Upload the required cover image
             const coverUrl = await uploadImageToImgur(coverFile);
 
@@ -81,13 +92,19 @@ document.getElementById("addButton").addEventListener("click", async () => {
         } catch (e) {
             console.error("Error adding document: ", e);
             alert("Error adding item.");
+        } finally {
+            // enable button after upload
+            addButton.disabled = false;
+            // button color
+            addButton.style.backgroundColor = "#D16A3B";
+            if (loadingText) loadingText.style.display = "none";
         }
     } else {
-        alert("Please fill out category, name, info, and upload a cover photo.");
+        alert("Please fill out category, name, info, atleast 1 image, and upload a cover photo.");
     }
 });
 
-// Upload to Imgur
+// upload to imgur
 async function uploadImageToImgur(imageFile) {
     const clientId = "b21c768afa164c8";
 
